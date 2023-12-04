@@ -13,7 +13,8 @@ public class MovingSprite extends JFrame {
         add(new Board());
 
         setTitle("Moving sprite");
-        setSize(820, 840);
+//        setSize(820, 840);
+        setSize(895, 1040);
 //        setExtendedState(JFrame.MAXIMIZED_BOTH);
 //        setUndecorated(true);
 

@@ -13,9 +13,8 @@ public class Board extends JPanel implements ActionListener {
     private final int B_WIDTH = 800;
     private final int B_HEIGHT = 800;
     private final int DOT_SIZE = 40;
-    private final int DELAY = 70;
 
-    private final ArrayList<Case> snakeBody = new ArrayList<>();
+    private ArrayList<Case> snakeBody;
     private int dots;
     private final Apple apple = new Apple(0,0);
 
@@ -23,13 +22,16 @@ public class Board extends JPanel implements ActionListener {
     private boolean rightDirection = false;
     private boolean upDirection = false;
     private boolean downDirection = false;
-    private boolean start = true;
-    private boolean inGame = true;
+    private boolean start;
+    private boolean inGame;
 
+    private final int DELAY = 140;
     private Timer timer;
     private final Random random = new Random();
     private final SnakeSprites snakeSprites = new SnakeSprites();
 
+    private final Font font = new Font("TimesRoman", Font.PLAIN, 20);
+    private int record = 0;
 
     public Board() {
         initBoard();
@@ -37,7 +39,7 @@ public class Board extends JPanel implements ActionListener {
 
     private void initBoard(){
         addKeyListener(new TAdapter());
-        setBackground(Color.green);
+        setBackground(new Color(39, 166, 33, 255));
         setFocusable(true);
 
         initGame();
@@ -46,8 +48,13 @@ public class Board extends JPanel implements ActionListener {
     private void initGame(){
         dots = 2;
 
-        snakeBody.add(new Case(B_WIDTH / 2, B_HEIGHT / 2));
-        snakeBody.add(new Case(B_WIDTH / 2, B_HEIGHT / 2 + DOT_SIZE));
+        snakeBody = new ArrayList<>();
+        start = true;
+        inGame = true;
+        rightDirection = leftDirection = downDirection = upDirection = false;
+
+        snakeBody.add(new Case( DOT_SIZE + B_WIDTH / 2, DOT_SIZE + B_HEIGHT / 2));
+        snakeBody.add(new Case(DOT_SIZE + B_WIDTH / 2, DOT_SIZE + B_HEIGHT / 2 + DOT_SIZE));
 
         locateApple();
 
@@ -59,8 +66,8 @@ public class Board extends JPanel implements ActionListener {
         int x;
         int y;
         do {
-            x = random.nextInt(0, 19) * DOT_SIZE;
-            y = random.nextInt(0, 19) * DOT_SIZE;
+            x = random.nextInt(0, 19) * DOT_SIZE + DOT_SIZE;
+            y = random.nextInt(0, 19) * DOT_SIZE + 3 * DOT_SIZE;
         } while (testOccupedPos(x, y));
 
         apple.setXY(x, y);
@@ -89,11 +96,27 @@ public class Board extends JPanel implements ActionListener {
         Graphics2D g2d = (Graphics2D) g;
 
         // background
-        g2d.drawImage(snakeSprites.getGrassBackground(), 0, 0, this);
+        g2d.setColor(new Color(31, 129, 26));
+        g2d.fillRect(0, 0, 895, DOT_SIZE * 2);
+
+        // Actual score
+        g2d.drawImage(snakeSprites.getApple(), DOT_SIZE, DOT_SIZE / 2, this);
+        g2d.setColor(Color.white);
+        g2d.setFont(font);
+        g2d.drawString("" + (dots - 2), (int) (DOT_SIZE * 2.5), (int) (DOT_SIZE * 1.2));
+
+        // highest score
+        if (record > 0){
+            g2d.drawImage(snakeSprites.getTrophy(), (int) (DOT_SIZE * 3.6), DOT_SIZE / 2, this);
+            g2d.drawString("" + (record), DOT_SIZE * 5, (int) (DOT_SIZE * 1.2));
+        }
+
+        // grass
+        g2d.drawImage(snakeSprites.getGrassBackground(), DOT_SIZE, DOT_SIZE * 3, this);
 
         if (inGame){
             // draw Apple
-            g2d.drawImage(apple.getImage(), apple.getX(), apple.getY(), this);
+            g2d.drawImage(snakeSprites.getApple(), apple.getX(), apple.getY(), this);
 
             // draw the snake body
 
@@ -184,7 +207,10 @@ public class Board extends JPanel implements ActionListener {
 
         else {
 
-            // TODO: GameOver
+            repaint();
+            record = dots - 2;
+            initGame();
+            repaint(DOT_SIZE * 5 - 10,  DOT_SIZE - 10, DOT_SIZE, DOT_SIZE);
 
         }
     }
@@ -193,6 +219,9 @@ public class Board extends JPanel implements ActionListener {
         if (apple.getX() == snakeBody.get(0).getX() && apple.getY() == snakeBody.get(0).getY()){
             dots ++;
             locateApple();
+
+            repaint(DOT_SIZE * 2 - 10,  DOT_SIZE - 10, DOT_SIZE, DOT_SIZE);
+
             snakeBody.add(new Case(apple.getX(), apple.getY()));
         }
     }
@@ -205,24 +234,23 @@ public class Board extends JPanel implements ActionListener {
             }
         }
 
-        if (snakeBody.get(0).getY() >= B_HEIGHT) {
+        if (snakeBody.get(0).getY() >= B_HEIGHT + 4 * DOT_SIZE) {
             inGame = false;
         }
 
-        if (snakeBody.get(0).getY() < 0) {
+        if (snakeBody.get(0).getY() < 3 * DOT_SIZE) {
             inGame = false;
         }
 
-        if (snakeBody.get(0).getX() >= B_WIDTH) {
+        if (snakeBody.get(0).getX() >= B_WIDTH + DOT_SIZE) {
             inGame = false;
         }
 
-        if (snakeBody.get(0).getX() < 0) {
+        if (snakeBody.get(0).getX() < DOT_SIZE) {
             inGame = false;
         }
 
         if (!inGame) {
-            repaint();
             timer.stop();
         }
     }
@@ -278,8 +306,6 @@ public class Board extends JPanel implements ActionListener {
         @Override
         public void keyPressed(KeyEvent e) {
 
-            start = false;
-
             long currentTime = System.currentTimeMillis();
 
             // Check if enough time has passed since the last key event
@@ -291,21 +317,25 @@ public class Board extends JPanel implements ActionListener {
                     leftDirection = true;
                     upDirection = false;
                     downDirection = false;
+                    start = false;
 
                 } else if ((key == KeyEvent.VK_RIGHT) && (!leftDirection)) {
                     rightDirection = true;
                     upDirection = false;
                     downDirection = false;
+                    start = false;
 
                 } else if ((key == KeyEvent.VK_UP) && (!downDirection)) {
                     upDirection = true;
                     leftDirection = false;
                     rightDirection = false;
+                    start = false;
 
                 } else if ((key == KeyEvent.VK_DOWN) && (!upDirection)) {
                     downDirection = true;
                     leftDirection = false;
                     rightDirection = false;
+                    start = false;
                 }
 
                 // Update the last key event time

@@ -19,6 +19,8 @@ public class SnakeSprites {
     private final Image bodyTopRight;
     private final Image bodyTopLeft;
     private final Image grassBackground;
+    private final Image trophy;
+    private final Image apple;
 
     public SnakeSprites(){
         headUp = new ImageIcon("src/Resources/head_up.png").getImage();
@@ -36,6 +38,16 @@ public class SnakeSprites {
         bodyTopRight = new ImageIcon("src/Resources/body_topright.png").getImage();
         bodyTopLeft = new ImageIcon("src/Resources/body_topleft.png").getImage();
         grassBackground = new ImageIcon("src/Resources/grassBackground.jpg").getImage();
+        trophy = new ImageIcon("src/Resources/trophy.png").getImage();
+        apple = new ImageIcon("src/Resources/appleSprite.png").getImage();
+    }
+
+    public Image getTrophy() {
+        return trophy;
+    }
+
+    public Image getApple() {
+        return apple;
     }
 
     public Image getGrassBackground() {
