@@ -13,7 +13,7 @@ public class Board extends JPanel implements ActionListener {
     private final int B_WIDTH = 800;
     private final int B_HEIGHT = 800;
     private final int DOT_SIZE = 40;
-    private final int DELAY = 140;
+    private final int DELAY = 70;
 
     private final ArrayList<Case> snakeBody = new ArrayList<>();
     private int dots;
@@ -273,7 +273,7 @@ public class Board extends JPanel implements ActionListener {
     private class TAdapter extends KeyAdapter {
 
         private long lastKeyEventTime = 0;
-        private static final long KEY_EVENT_DELAY = 80;
+        private static final long KEY_EVENT_DELAY = 50;
 
         @Override
         public void keyPressed(KeyEvent e) {
