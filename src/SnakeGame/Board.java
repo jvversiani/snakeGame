@@ -208,7 +208,7 @@ public class Board extends JPanel implements ActionListener {
         else {
 
             repaint();
-            record = dots - 2;
+            record = Math.max(dots - 2, record);
             initGame();
             repaint(DOT_SIZE * 5 - 10,  DOT_SIZE - 10, DOT_SIZE, DOT_SIZE);
 
