@@ -54,7 +54,7 @@ public class Board extends JPanel implements ActionListener {
         inGame = true;
         direction = -1;
 
-        snakeBody.add(new Case( DOT_SIZE + B_WIDTH / 2, DOT_SIZE + B_HEIGHT / 2));
+        snakeBody.add(new Case(DOT_SIZE + B_WIDTH / 2, DOT_SIZE + B_HEIGHT / 2));
         snakeBody.add(new Case(DOT_SIZE + B_WIDTH / 2, DOT_SIZE + B_HEIGHT / 2 + DOT_SIZE));
 
         head = snakeBody.get(0);
@@ -74,8 +74,6 @@ public class Board extends JPanel implements ActionListener {
         } while (testOccupedPos(x, y));
 
         apple.setXY(x, y);
-
-        repaint(apple.getX(), apple.getY(), DOT_SIZE, DOT_SIZE);
     }
 
     private boolean testOccupedPos(int x, int y){
@@ -127,15 +125,19 @@ public class Board extends JPanel implements ActionListener {
             switch (direction){
                 case 0:{
                     g2d.drawImage(snakeSprites.getHeadRight(), head.getX(), head.getY(), this);
+                    break;
                 }
                 case 1:{
                     g2d.drawImage(snakeSprites.getHeadLeft(), head.getX(), head.getY(), this);
+                    break;
                 }
                 default: {
                     g2d.drawImage(snakeSprites.getHeadUp(), head.getX(), head.getY(), this);
+                    break;
                 }
                 case 3:{
                     g2d.drawImage(snakeSprites.getHeadDown(), head.getX(), head.getY(), this);
+                    break;
                 }
             }
 
@@ -216,7 +218,6 @@ public class Board extends JPanel implements ActionListener {
             repaint();
             record = Math.max(dots - 2, record);
             initGame();
-            repaint(DOT_SIZE * 5 - 10,  DOT_SIZE - 10, DOT_SIZE, DOT_SIZE);
 
         }
     }
@@ -225,8 +226,6 @@ public class Board extends JPanel implements ActionListener {
         if (apple.getX() == head.getX() && apple.getY() == head.getY()){
             dots ++;
             locateApple();
-
-            repaint(DOT_SIZE * 2 - 10,  DOT_SIZE - 10, DOT_SIZE, DOT_SIZE);
 
             snakeBody.add(new Case(apple.getX(), apple.getY()));
         }
@@ -273,43 +272,27 @@ public class Board extends JPanel implements ActionListener {
             checkEatApple();
             move();
 
-            // Small repaint optimization
-            repaint(Math.max(head.getX() - DOT_SIZE, 0), Math.max(head.getY() - DOT_SIZE, 0), DOT_SIZE * 3, DOT_SIZE * 3);
-            repaint(Math.max(snakeBody.get(dots - 1).getX() - DOT_SIZE, 0), Math.max(snakeBody.get(dots - 1).getY() - DOT_SIZE, 0), DOT_SIZE * 3, DOT_SIZE * 3);
+            repaint();
         }
     }
 
 
     private class TAdapter extends KeyAdapter {
-
-        private long lastKeyEventTime = 0;
-        private static final long KEY_EVENT_DELAY = 0;
-
         @Override
         public void keyPressed(KeyEvent e) {
+            int key = e.getKeyCode();
 
-            long currentTime = System.currentTimeMillis();
+            if ((key == KeyEvent.VK_LEFT) && (head.getX() <= snakeBody.get(1).getX())) {
+                direction = 1;
 
-            // Check if enough time has passed since the last key event
-            if (currentTime - lastKeyEventTime >= KEY_EVENT_DELAY) {
+            } else if ((key == KeyEvent.VK_RIGHT) && (head.getX() >= snakeBody.get(1).getX())) {
+                direction = 0;
 
-                int key = e.getKeyCode();
+            } else if ((key == KeyEvent.VK_UP) && (head.getY() <= snakeBody.get(1).getY())) {
+                direction = 2;
 
-                if ((key == KeyEvent.VK_LEFT) && (direction != 0)) {
-                    direction = 1;
-
-                } else if ((key == KeyEvent.VK_RIGHT) && (direction != 1)) {
-                    direction = 0;
-
-                } else if ((key == KeyEvent.VK_UP) && (direction != 3)) {
-                    direction = 2;
-
-                } else if ((key == KeyEvent.VK_DOWN) && (direction != 2)) {
-                    direction = 3;
-                }
-
-                // Update the last key event time
-                lastKeyEventTime = currentTime;
+            } else if ((key == KeyEvent.VK_DOWN) && (head.getY() >= snakeBody.get(1).getY())) {
+                direction = 3;
             }
         }
     }
