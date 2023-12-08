@@ -35,10 +35,7 @@ public class Board extends JPanel implements ActionListener {
     private final Font font = new Font("TimesRoman", Font.PLAIN, 20);
     private int record = 0;
 
-
-    private boolean soundEnabled = true; // Added variable to track sound state
-
-    private JButton muteButton;
+    private final MuteButton muteButton = new MuteButton(this);
 
     public Board() {
         initBoard();
@@ -48,6 +45,9 @@ public class Board extends JPanel implements ActionListener {
         addKeyListener(new TAdapter());
         setBackground(new Color(39, 166, 33, 255));
         setFocusable(true);
+        setLayout(null);
+
+        add(muteButton);
 
         initGame();
     }
@@ -63,7 +63,7 @@ public class Board extends JPanel implements ActionListener {
         snakeBody.add(new Case(DOT_SIZE + B_WIDTH / 2, DOT_SIZE + B_HEIGHT / 2 + DOT_SIZE));
 
         head = snakeBody.get(0);
-        
+
         locateApple();
 
         timer = new Timer(DELAY, this);
@@ -230,7 +230,9 @@ public class Board extends JPanel implements ActionListener {
     public void checkEatApple(){
         if (apple.getX() == head.getX() && apple.getY() == head.getY()){
             dots ++;
-            new Thread(new EatAppleSounds()).start();
+
+            if (muteButton.isSound())
+                new Thread(new EatAppleSounds()).start();
 
             locateApple();
 
@@ -301,13 +303,6 @@ public class Board extends JPanel implements ActionListener {
             } else if ((key == KeyEvent.VK_DOWN) && (head.getY() >= snakeBody.get(1).getY())) {
                 direction = 3;
             }
-        }
-    }
-
-    private class MuteButtonListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            soundEnabled = !soundEnabled; // Toggle sound state
         }
     }
 }
